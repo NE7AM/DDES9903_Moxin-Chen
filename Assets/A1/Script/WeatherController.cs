@@ -7,7 +7,13 @@ public class WeatherController : MonoBehaviour
     public Light sunLight;
     public Light lightningLight;
 
+    public AudioSource thunderSource;
+    public AudioSource darkBgmSource;
+    public AudioSource secondBroadcastSource;
+
     public float transitionTime = 6f;
+    public float thunderTime = 1.8f;
+    public float secondBroadcastDelay = 1.8f;
 
     public float darkSunnyExposure = 0.28f;
     public Color darkSunnyTint = new Color32(95, 100, 115, 255);
@@ -21,19 +27,7 @@ public class WeatherController : MonoBehaviour
     private bool stormStarted;
     private Material sunnySkybox;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-    
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-    
-    }
-
-public void StartStorm()
+    public void StartStorm()
     {
         if (stormStarted)
         {
@@ -117,15 +111,42 @@ public void StartStorm()
 
     private IEnumerator ChangeSkyWithLightning()
     {
+        if (thunderSource != null)
+        {
+            thunderSource.Play();
+        }
+
+        if (secondBroadcastSource != null)
+        {
+            secondBroadcastSource.PlayDelayed(secondBroadcastDelay);
+        }
+
+        lightningLight.enabled = true;
+
+        yield return new WaitForSeconds(0.12f);
+
+        RenderSettings.skybox = darkSkybox;
+
+        lightningLight.enabled = false;
+
+        yield return new WaitForSeconds(0.18f);
+
         lightningLight.enabled = true;
 
         yield return new WaitForSeconds(0.08f);
 
-        RenderSettings.skybox = darkSkybox;
-        DynamicGI.UpdateEnvironment();
-
-        yield return new WaitForSeconds(0.08f);
-
         lightningLight.enabled = false;
+
+        float remainingTime = thunderTime - 0.38f;
+
+        if (remainingTime > 0f)
+        {
+            yield return new WaitForSeconds(remainingTime);
+        }
+
+        if (darkBgmSource != null)
+        {
+            darkBgmSource.Play();
+        }
     }
 }
