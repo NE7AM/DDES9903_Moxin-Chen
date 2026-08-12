@@ -12,7 +12,7 @@ public class Typable : InteractableGeneral
 {
     [Header("Basic Typing Settings")]
     public string cursorText = "_";
-    public bool releaseOnEnterKey = true;    
+    public bool releaseOnEnterKey = true;
     public UnityEvent onReleaseTyping;
     public UnityEvent onEnterKeyNotForWebGL;
     public UnityEvent onTextInput;
@@ -21,19 +21,33 @@ public class Typable : InteractableGeneral
     public string matchText;
     public UnityEvent onTextMatch;
     public TextMatchRelay textMatchRelay;
-    
-
 
     [Header("System Stuff - Usually Don't Touch")]
     public string typeTextBuffer;
     public bool typeCapture;
-    public TextMeshProUGUI textDisplay;    
+    public TextMeshProUGUI textDisplay;
 
-    public RaycastInteractor raycastInteractor;    
+    public RaycastInteractor raycastInteractor;
+
+    private int lastDeleteFrame = -1;
 
     private void Start()
     {
         Keyboard.current.onTextInput += OnTextInput;
+    }
+
+    private void Update()
+    {
+        if (!typeCapture || Keyboard.current == null)
+        {
+            return;
+        }
+
+        if (Keyboard.current.backspaceKey.wasPressedThisFrame ||
+            Keyboard.current.deleteKey.wasPressedThisFrame)
+        {
+            DeleteLastCharacter();
+        }
     }
 
     public void OnMouseDown()
@@ -43,58 +57,73 @@ public class Typable : InteractableGeneral
 
     private void OnTextInput(char ch)
     {
-        if (typeCapture)
+        if (!typeCapture)
         {
-            if (ch == '\b')
-            {
-                //backspace
-                if(typeTextBuffer.Length >= 1)
-                    typeTextBuffer = typeTextBuffer.Substring(0, typeTextBuffer.Length - 1);
-            }
-            else if (ch == 127)
-            {
-                Debug.Log("MAC backspace");
-                //backspace
-                if (typeTextBuffer.Length >= 1)
-                    typeTextBuffer = typeTextBuffer.Substring(0, typeTextBuffer.Length - 1);
-            }
-            else if (Keyboard.current.enterKey.wasPressedThisFrame)
-            {
-                Debug.Log("enterKey.wasPressed");
-                HandleEnterKey();
-            }
-            //else if(ch == '\r')
-            //{
-            //    HandleEnterKey();
-            //}
-            else if(ch == '')
-            {
-                raycastInteractor.ReleaseFromTyping();
-                //_  <- the escape key string
-            }
-            else if(ch == '`')
-            {
-                onReleaseTyping.Invoke();
-                raycastInteractor.ReleaseFromTyping();
-                //tab: '\t'
-                //tab: '\x09'
-            }
-            else
-            {
-                typeTextBuffer += ch;
-            }
-
-            SyncText();
-            onTextInput.Invoke();
+            return;
         }
+
+        if (ch == '\b' || ch == 127)
+        {
+            DeleteLastCharacter();
+            return;
+        }
+
+        if (Keyboard.current.enterKey.wasPressedThisFrame)
+        {
+            Debug.Log("enterKey.wasPressed");
+            HandleEnterKey();
+        }
+        else if (ch == '')
+        {
+            raycastInteractor.ReleaseFromTyping();
+        }
+        else if (ch == '`')
+        {
+            onReleaseTyping.Invoke();
+            raycastInteractor.ReleaseFromTyping();
+        }
+        else
+        {
+            typeTextBuffer += ch;
+        }
+
+        SyncText();
+        onTextInput.Invoke();
+    }
+
+    private void DeleteLastCharacter()
+    {
+        // Prevent double deletion if WebGL and onTextInput
+        // report the same key during one frame.
+        if (lastDeleteFrame == Time.frameCount)
+        {
+            return;
+        }
+
+        lastDeleteFrame = Time.frameCount;
+
+        if (typeTextBuffer.Length > 0)
+        {
+            typeTextBuffer = typeTextBuffer.Substring(
+                0,
+                typeTextBuffer.Length - 1
+            );
+        }
+
+        SyncText();
+        onTextInput.Invoke();
     }
 
     public void HandleEnterKey()
     {
         if (releaseOnEnterKey)
+        {
             raycastInteractor.ReleaseFromTyping();
+        }
         else
+        {
             typeTextBuffer += '\n';
+        }
 
         onEnterKeyNotForWebGL.Invoke();
     }
@@ -120,15 +149,20 @@ public class Typable : InteractableGeneral
                     onTextMatch.Invoke();
 
                     if (raycastInteractor != null)
+                    {
                         raycastInteractor.ReleaseFromTyping();
+                    }
                 }
             }
 
-            if(textMatchRelay != null)
+            if (textMatchRelay != null)
+            {
                 textMatchRelay.CheckMatch();
+            }
         }
         else
+        {
             textDisplay.text = typeTextBuffer;
+        }
     }
- }
-
+}
