@@ -18,8 +18,8 @@ TagManager:
   - Ignore Player Collision
   - Moving Platforms
   - Debug
-  - 
-  - 
+  - NavMeshGround
+  - NavMeshObstacle
   - 
   - 
   - 
