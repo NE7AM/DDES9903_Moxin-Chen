@@ -7,22 +7,23 @@ public class MemoryExitDoor : MonoBehaviour
 
     public void ExitMemory()
     {
-        Debug.Log("ExitMemory called: " + memoryType);
-
-        if (StoryState.Instance == null)
-        {
-            Debug.LogError("StoryState.Instance is NULL!");
-            return;
-        }
-
         StoryState.Instance.VisitMemory(memoryType);
 
-        Debug.Log("Visited: " + memoryType);
-        Debug.Log("Visited Count: " + StoryState.Instance.VisitedCount());
+        Debug.Log("Exit from: " + memoryType);
+        Debug.Log("Anger: " + StoryState.Instance.angerVisited);
+        Debug.Log("Family: " + StoryState.Instance.familyVisited);
+        Debug.Log("Freedom: " + StoryState.Instance.freedomVisited);
+        Debug.Log("Count: " + StoryState.Instance.VisitedCount());
 
         if (StoryState.Instance.VisitedCount() >= 2)
+        {
+            Debug.Log("Loading TrainStation");
             SceneManager.LoadScene("TrainStation");
+        }
         else
+        {
+            Debug.Log("Loading Grassland");
             SceneManager.LoadScene("Grassland");
+        }
     }
 }

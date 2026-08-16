@@ -9,6 +9,7 @@ public class IntroSequence : MonoBehaviour
 
     public AudioClip motherVoice;
     public AudioClip fatherVoice;
+    public AudioClip playerInner;
     public AudioClip doorSlam;
 
     public CanvasGroup blackCanvas;
@@ -29,6 +30,7 @@ public class IntroSequence : MonoBehaviour
 
         yield return PlayVoice(motherVoice);
         yield return PlayVoice(fatherVoice);
+        yield return PlayVoice(playerInner);
 
         audioSource.PlayOneShot(doorSlam);
         yield return new WaitForSeconds(doorSoundTime);

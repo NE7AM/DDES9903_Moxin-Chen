@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/A2/Scenes/Bedroom.unity
     guid: a7543947373e94b8da1b622eb116c26e
   - enabled: 1
@@ -20,7 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/A2/Scenes/FreedomMemory.unity
     guid: d54d67d4844a54003bfff94b7a2ce403
-  - enabled: 0
+  - enabled: 1
     path: Assets/A2/Scenes/TrainStation.unity
     guid: ab3dbf10a994c41b8b4a352901267412
   m_configObjects:

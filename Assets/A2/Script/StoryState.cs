@@ -15,6 +15,9 @@ public class StoryState : MonoBehaviour
     public bool familyVisited;
     public bool freedomVisited;
 
+    public bool hasAwayTicket;
+    public bool hasHouseKey;
+
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -59,5 +62,15 @@ public class StoryState : MonoBehaviour
         if (freedomVisited) count++;
 
         return count;
+    }
+
+    public void GetAwayTicket()
+    {
+        hasAwayTicket = true;
+    }
+
+    public void GetHouseKey()
+    {
+        hasHouseKey = true;
     }
 }
